@@ -1,3 +1,7 @@
+# Terraform AWS Sentinel
+
+
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -53,3 +57,6 @@ No modules.
 |------|-------------|
 | <a name="output_sentinel_queue_url"></a> [sentinel\_queue\_url](#output\_sentinel\_queue\_url) | n/a |
 | <a name="output_sentinel_role_arn"></a> [sentinel\_role\_arn](#output\_sentinel\_role\_arn) | n/a |
+
+
+<!-- END_TF_DOCS -->
