@@ -9,7 +9,7 @@ It creates all resources required for the Sentinel S3 Connector.
  ```hcl
  module "sentinel" {
   
-  source = "git::https://github.com/pagopa/azurerm.git//terraform-aws-sentinel?ref=v1.1.0"
+  source = "git::https://github.com/pagopa/terraform-aws-sentinel.git?ref=v1.0.0"
 
   account_id            = data.aws_caller_identity.current.account_id
   queue_name            = "sentinel-queue"
