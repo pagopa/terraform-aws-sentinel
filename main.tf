@@ -3,7 +3,7 @@ resource "aws_iam_policy" "sentinel_allow_kms" {
   description = "Policy to allow sentinel to encrypt and decrypt data with kms key"
 
   policy = templatefile(
-    "./iam_policies/allow-sentinel-kms.tpl.json",
+    "${path.module}/iam_policies/allow-sentinel-kms.tpl.json",
     {
       account_id = var.account_id
     }
@@ -33,7 +33,7 @@ resource "aws_iam_role" "sentinel" {
 }
 
 locals {
-  sentinel_policies = ["AmazonSQSReadOnlyAccess", "AmazonS3ReadOnlyAccess", aws_iam_policy.sentinel_allow_kms[0].name]
+  sentinel_policies = ["AmazonSQSReadOnlyAccess", "AmazonS3ReadOnlyAccess", aws_iam_policy.sentinel_allow_kms.name]
 }
 
 data "aws_iam_policy" "sentinel" {
@@ -47,7 +47,7 @@ data "aws_iam_policy" "sentinel" {
 
 resource "aws_iam_role_policy_attachment" "sentinel" {
   count      = length(local.sentinel_policies)
-  role       = aws_iam_role.sentinel[0].name
+  role       = aws_iam_role.sentinel.name
   policy_arn = data.aws_iam_policy.sentinel[count.index].arn
 }
 
@@ -55,7 +55,7 @@ resource "aws_iam_role_policy_attachment" "sentinel" {
 resource "aws_sqs_queue" "sentinel" {
   name = var.queue_name
 
-  policy = templatefile("./iam_policies/allow-sqs-s3.tpl.json",
+  policy = templatefile("${path.module}/iam_policies/allow-sqs-s3.tpl.json",
     {
       queue_name = var.queue_name
       bucket_arn = aws_s3_bucket.sentinel_logs.arn
@@ -91,8 +91,8 @@ resource "aws_s3_bucket_public_access_block" "sentinel_logs" {
 resource "aws_s3_bucket_policy" "sentinel_logs" {
   bucket = aws_s3_bucket.sentinel_logs.id
 
-  policy = templatefile("./iam_policies/allow-s3-cloudtrail.tpl.json", {
-    account_id  = data.aws_caller_identity.current.account_id
+  policy = templatefile("${path.module}/iam_policies/allow-s3-cloudtrail.tpl.json", {
+    account_id  = var.account_id
     bucket_name = aws_s3_bucket.sentinel_logs.id
   })
 }
@@ -131,15 +131,15 @@ resource "aws_kms_key" "sentinel_logs" {
   description              = "Kms key to entrypt cloudtrail logs."
   customer_master_key_spec = "SYMMETRIC_DEFAULT"
 
-  policy = templatefile("./iam_policies/allow-kms-cloudtrail.tpl.json", {
-    account_id = data.aws_caller_identity.current.account_id
-    trail_name = local.trail_name
+  policy = templatefile("${path.module}/iam_policies/allow-kms-cloudtrail.tpl.json", {
+    account_id = var.account_id
+    trail_name = var.trail_name
     aws_region = var.aws_region
   })
 }
 
 resource "aws_kms_alias" "sentinel_logs" {
-  name          = "alias/%s-sentinel-logs"
+  name          = "alias/sentinel-logs-key"
   target_key_id = aws_kms_key.sentinel_logs.id
 }
 

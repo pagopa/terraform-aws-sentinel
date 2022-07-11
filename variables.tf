@@ -38,6 +38,6 @@ variable "expiration_days" {
 }
 
 variable "trail_name" {
-  type       = string
-  desciption = "Trail name with events to send to azure sentinel."
+  type        = string
+  description = "Trail name with events to send to azure sentinel."
 }
