@@ -1,5 +1,24 @@
 # Terraform AWS Sentinel
 
+Terraform module which creates all resources to connect S3 to Azure Sentilen.
+It creates all resources required for the Sentinel S3 Connector.
+
+
+## Exampla usage
+
+ ```hcl
+ module "sentinel" {
+  
+  source = "git::https://github.com/pagopa/azurerm.git//terraform-aws-sentinel?ref=v1.1.0"
+
+  account_id            = data.aws_caller_identity.current.account_id
+  queue_name            = "sentinel-queue"
+  trail_name            = "sentinel-trail"
+  sentinel_bucket_name  = "sentinel-logs"
+  expiration_days       = 3
+  sentinel_workspace_id = "12321312323213"
+}
+ ```
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
