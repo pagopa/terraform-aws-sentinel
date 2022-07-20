@@ -59,7 +59,7 @@ data "aws_iam_policy" "sentinel" {
 
   depends_on = [
     aws_iam_policy.sentinel_allow_kms,
-    aws_iam_policy.sentinel_allow_sqs.name,
+    aws_iam_policy.sentinel_allow_sqs,
   ]
 }
 
