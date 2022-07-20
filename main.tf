@@ -10,6 +10,18 @@ resource "aws_iam_policy" "sentinel_allow_kms" {
   )
 }
 
+resource "aws_iam_policy" "sentinel_allow_sqs" {
+  name        = "AllowSentinelSQS"
+  description = "Policy to allow sentinel to get and delete messages in SQS"
+
+  policy = templatefile(
+    "${path.module}/iam_policies/allow-sentinel-sqs.tpl.json",
+    {
+      sqs_queue_arn = aws_sqs_queue.sentinel.arn
+    }
+  )
+}
+
 resource "aws_iam_role" "sentinel" {
   name = "MicrosoftSentinelRole"
 
@@ -33,7 +45,12 @@ resource "aws_iam_role" "sentinel" {
 }
 
 locals {
-  sentinel_policies = ["AmazonSQSReadOnlyAccess", "AmazonS3ReadOnlyAccess", aws_iam_policy.sentinel_allow_kms.name]
+  sentinel_policies = [
+    "AmazonSQSReadOnlyAccess",
+    "AmazonS3ReadOnlyAccess",
+    aws_iam_policy.sentinel_allow_kms.name,
+    aws_iam_policy.sentinel_allow_sqs.name
+  ]
 }
 
 data "aws_iam_policy" "sentinel" {
@@ -156,8 +173,9 @@ resource "aws_cloudtrail" "sentinel" {
   kms_key_id                    = aws_kms_key.sentinel_logs.arn
 
   event_selector {
-    read_write_type           = "All"
-    include_management_events = true
+    read_write_type                  = "All"
+    include_management_events        = true
+    exclude_management_event_sources = ["kms.amazonaws.com", ]
   }
 
   depends_on = [
