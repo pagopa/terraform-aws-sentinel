@@ -55,6 +55,8 @@ resource "aws_iam_role_policy_attachment" "sentinel" {
 resource "aws_sqs_queue" "sentinel" {
   name = var.queue_name
 
+  sqs_managed_sse_enabled = true
+
   policy = templatefile("${path.module}/iam_policies/allow-sqs-s3.tpl.json",
     {
       queue_name = var.queue_name
