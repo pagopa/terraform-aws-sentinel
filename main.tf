@@ -49,7 +49,7 @@ locals {
     "AmazonSQSReadOnlyAccess",
     "AmazonS3ReadOnlyAccess",
     aws_iam_policy.sentinel_allow_kms.name,
-    aws_iam_policy.sentinel_allow_sqs.name
+    aws_iam_policy.sentinel_allow_sqs.name,
   ]
 }
 
@@ -58,7 +58,8 @@ data "aws_iam_policy" "sentinel" {
   name  = local.sentinel_policies[count.index]
 
   depends_on = [
-    aws_iam_policy.sentinel_allow_kms
+    aws_iam_policy.sentinel_allow_kms,
+    aws_iam_policy.sentinel_allow_sqs.name,
   ]
 }
 
