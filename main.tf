@@ -108,8 +108,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "sentinel" {
     id = "clean"
 
     noncurrent_version_expiration {
-      newer_noncurrent_versions = 1
-      noncurrent_days           = 1
+      noncurrent_days = 1
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
     }
 
     status = "Enabled"
@@ -148,7 +151,7 @@ resource "aws_cloudtrail" "sentinel" {
   name                          = var.trail_name
   s3_bucket_name                = aws_s3_bucket.sentinel_logs.id
   include_global_service_events = true
-  kms_key_id                    = aws_kms_alias.sentinel_logs.arn
+  kms_key_id                    = aws_kms.sentinel_logs.arn
 
   event_selector {
     read_write_type           = "All"
