@@ -41,3 +41,15 @@ variable "trail_name" {
   type        = string
   description = "Trail name with events to send to azure sentinel."
 }
+
+variable "is_organization_trail" {
+  type        = bool
+  description = "Whether the trail is an AWS Organizations trail. Organization trails log events for the master account and all member accounts. Can only be created in the organization master account."
+  default     = falseß
+}
+
+variable "is_multi_region_trail" {
+  type        = bool
+  default     = false
+  description = "Whether the trail is created in the current region or in all regions."
+}
