@@ -10,6 +10,18 @@ resource "aws_iam_policy" "sentinel_allow_kms" {
   )
 }
 
+resource "aws_iam_policy" "sentinel_allow_sqs" {
+  name        = "AllowSentinelSQS"
+  description = "Policy to allow sentinel to get and delete messages in SQS"
+
+  policy = templatefile(
+    "${path.module}/iam_policies/allow-sentinel-sqs.tpl.json",
+    {
+      sqs_queue_arn = aws_sqs_queue.sentinel.arn
+    }
+  )
+}
+
 resource "aws_iam_role" "sentinel" {
   name = "MicrosoftSentinelRole"
 
@@ -33,7 +45,12 @@ resource "aws_iam_role" "sentinel" {
 }
 
 locals {
-  sentinel_policies = ["AmazonSQSReadOnlyAccess", "AmazonS3ReadOnlyAccess", aws_iam_policy.sentinel_allow_kms.name]
+  sentinel_policies = [
+    "AmazonSQSReadOnlyAccess",
+    "AmazonS3ReadOnlyAccess",
+    aws_iam_policy.sentinel_allow_kms.name,
+    aws_iam_policy.sentinel_allow_sqs.name,
+  ]
 }
 
 data "aws_iam_policy" "sentinel" {
@@ -41,7 +58,8 @@ data "aws_iam_policy" "sentinel" {
   name  = local.sentinel_policies[count.index]
 
   depends_on = [
-    aws_iam_policy.sentinel_allow_kms
+    aws_iam_policy.sentinel_allow_kms,
+    aws_iam_policy.sentinel_allow_sqs,
   ]
 }
 
@@ -54,6 +72,8 @@ resource "aws_iam_role_policy_attachment" "sentinel" {
 # SQS queue
 resource "aws_sqs_queue" "sentinel" {
   name = var.queue_name
+
+  sqs_managed_sse_enabled = true
 
   policy = templatefile("${path.module}/iam_policies/allow-sqs-s3.tpl.json",
     {
@@ -108,8 +128,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "sentinel" {
     id = "clean"
 
     noncurrent_version_expiration {
-      newer_noncurrent_versions = 1
-      noncurrent_days           = 1
+      noncurrent_days = 1
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
     }
 
     status = "Enabled"
@@ -148,11 +171,12 @@ resource "aws_cloudtrail" "sentinel" {
   name                          = var.trail_name
   s3_bucket_name                = aws_s3_bucket.sentinel_logs.id
   include_global_service_events = true
-  kms_key_id                    = aws_kms_alias.sentinel_logs.arn
+  kms_key_id                    = aws_kms_key.sentinel_logs.arn
 
   event_selector {
-    read_write_type           = "All"
-    include_management_events = true
+    read_write_type                  = "All"
+    include_management_events        = true
+    exclude_management_event_sources = ["kms.amazonaws.com", ]
   }
 
   depends_on = [
