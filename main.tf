@@ -112,9 +112,8 @@ resource "aws_s3_bucket_policy" "sentinel_logs" {
   bucket = aws_s3_bucket.sentinel_logs.id
 
   policy = templatefile("${path.module}/iam_policies/allow-s3-cloudtrail.tpl.json", {
-    account_id      = var.account_id
-    bucket_name     = aws_s3_bucket.sentinel_logs.id
-    cloud_trail_arn = aws_cloudtrail.sentinel.arn
+    account_id  = var.account_id
+    bucket_name = aws_s3_bucket.sentinel_logs.id
   })
 }
 
