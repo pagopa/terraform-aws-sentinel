@@ -3,6 +3,12 @@ variable "account_id" {
   description = "AWS account id"
 }
 
+variable "organization_id" {
+  type        = string
+  description = "AWS organization id: when you integrate Sentinel to the whole organization. is_organization_trail should be true."
+  default     = null
+}
+
 variable "aws_region" {
   type        = string
   description = "AWS Region"
