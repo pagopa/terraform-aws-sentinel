@@ -67,6 +67,7 @@ No modules.
 | <a name="input_expiration_days"></a> [expiration\_days](#input\_expiration\_days) | The lifetime, in days, of the objects that are subject to the rule. | `number` | `7` | no |
 | <a name="input_is_multi_region_trail"></a> [is\_multi\_region\_trail](#input\_is\_multi\_region\_trail) | Whether the trail is created in the current region or in all regions. | `bool` | `false` | no |
 | <a name="input_is_organization_trail"></a> [is\_organization\_trail](#input\_is\_organization\_trail) | Whether the trail is an AWS Organizations trail. Organization trails log events for the master account and all member accounts. Can only be created in the organization master account. | `bool` | `false` | no |
+| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | AWS organization id: when you integrate Sentinel to the whole organization. is\_organization\_trail should be true. | `string` | `null` | no |
 | <a name="input_queue_name"></a> [queue\_name](#input\_queue\_name) | SQS queue sentinel gets notification for new logs to read. | `string` | n/a | yes |
 | <a name="input_sentinel_bucket_name"></a> [sentinel\_bucket\_name](#input\_sentinel\_bucket\_name) | Bucket where cloud trail logs are stored and consumed by sentinel. | `string` | n/a | yes |
 | <a name="input_sentinel_servcie_account_id"></a> [sentinel\_servcie\_account\_id](#input\_sentinel\_servcie\_account\_id) | Microsoft Sentinel's service account ID for AWS. | `string` | `"197857026523"` | no |
