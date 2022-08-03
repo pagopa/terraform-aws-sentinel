@@ -11,7 +11,7 @@
             "Resource": "arn:aws:s3:::${bucket_name}"
         },
         {
-            "Sid": "AWSCloudTrailWrite20150319",
+            "Sid": "AWSCloudTrailWriteByAccount",
             "Effect": "Allow",
             "Principal": {
                 "Service": "cloudtrail.amazonaws.com"
@@ -24,5 +24,22 @@
                 }
             }
         }
+        %{ if organization_id != null ~}
+        ,
+        {
+            "Sid": "AWSCloudTrailWriteByOrganization",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "cloudtrail.amazonaws.com"
+            },
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::${bucket_name}/AWSLogs/${organization_id}/*",
+            "Condition": {
+                "StringEquals": { 
+                    "s3:x-amz-acl": "bucket-owner-full-control"
+                }
+            }
+        }
+        %{ endif ~}
     ]
 }

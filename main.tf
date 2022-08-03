@@ -112,8 +112,9 @@ resource "aws_s3_bucket_policy" "sentinel_logs" {
   bucket = aws_s3_bucket.sentinel_logs.id
 
   policy = templatefile("${path.module}/iam_policies/allow-s3-cloudtrail.tpl.json", {
-    account_id  = var.account_id
-    bucket_name = aws_s3_bucket.sentinel_logs.id
+    account_id      = var.account_id
+    organization_id = var.organization_id
+    bucket_name     = aws_s3_bucket.sentinel_logs.id
   })
 }
 
@@ -172,6 +173,8 @@ resource "aws_cloudtrail" "sentinel" {
   s3_bucket_name                = aws_s3_bucket.sentinel_logs.id
   include_global_service_events = true
   kms_key_id                    = aws_kms_key.sentinel_logs.arn
+  is_organization_trail         = var.is_organization_trail
+  is_multi_region_trail         = var.is_multi_region_trail
 
   event_selector {
     read_write_type                  = "All"
